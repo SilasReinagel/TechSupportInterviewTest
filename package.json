@@ -1,0 +1,17 @@
+{
+  "name": "accounts-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/index.js",
+    "install": "concurrently \"cd webapp && npm install\" \"cd backend && npm install\"",
+    "dev": "concurrently \"cd backend && nodemon backend/index.js\" \"cd webapp && npm run dev\"",
+    "clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.7"
+  }
+}
