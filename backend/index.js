@@ -1,9 +1,16 @@
 // @ts-check
 import express from 'express';
-import { getAllAccounts, createAccount, createJob, updateQuickBooksSync, executeQuery } from './db.js';
+import cors from 'cors';
+import { getAllAccounts, createAccount, createJob, executeQuery, getAccount } from './db.js';
 import { seedDatabase } from './db-seeder.js';
+import { syncAccountToQuickBooks } from './qb.js';
 
 const app = express();
+app.use(cors({
+  origin: '*',
+  methods: '*',
+  allowedHeaders: '*'
+}));
 app.use(express.json());
 
 const port = 3089;
@@ -46,7 +53,11 @@ app.post('/api/jobs', async (req, res) => {
 app.post('/api/accounts/:id/sync', async (req, res) => {
     try {
         const accountId = parseInt(req.params.id);
-        await updateQuickBooksSync(accountId, true);
+        const account = await getAccount(accountId);
+        if (!account) {
+            throw new Error('Account not found');
+        }
+        await syncAccountToQuickBooks(accountId, account.accountName);
         res.json({ success: true });
     } catch (error) {
         console.error('Error syncing account:', error);

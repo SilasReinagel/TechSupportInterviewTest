@@ -75,6 +75,27 @@ export async function getAllAccounts() {
 }
 
 /**
+ * Get a single account by ID with its associated jobs
+ * @param {number} accountId - The ID of the account to retrieve
+ * @returns {Promise<Account|null>} The account if found, null otherwise
+ */
+export async function getAccount(accountId) {
+    const account = await db.get('SELECT * FROM accounts WHERE id = ?', accountId);
+    
+    if (!account) {
+        return null;
+    }
+
+    const jobs = await db.all('SELECT * FROM jobs WHERE accountId = ?', accountId);
+
+    return {
+        ...account,
+        isSyncedToQuickbooks: Boolean(account.isSyncedToQuickbooks),
+        jobs
+    };
+}
+
+/**
  * Create a new account
  * @param {Omit<Account, 'id' | 'jobs' | 'isSyncedToQuickbooks'>} accountData
  * @returns {Promise<Account>}

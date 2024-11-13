@@ -5,8 +5,9 @@
   "scripts": {
     "start": "node backend/index.js",
     "install": "concurrently \"cd webapp && npm install\" \"cd backend && npm install\"",
-    "dev": "concurrently \"cd backend && nodemon backend/index.js\" \"cd webapp && npm run dev\"",
-    "clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js"
+    "dev": "npm run install && concurrently \"cd backend && npm run dev\" \"cd webapp && npm run dev\"",
+    "clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js",
+    "reset-dev": "npm run clear-db && npm run dev"
   },
   "dependencies": {
   },

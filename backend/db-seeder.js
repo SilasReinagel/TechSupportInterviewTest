@@ -1,6 +1,24 @@
 // @ts-check
 import { faker } from '@faker-js/faker';
 import { initDb, createAccount, createJob, getAllAccounts } from './db.js';
+import { syncAccountToQuickBooks } from './qb.js';
+
+const accountsToMerge = [
+  {
+    accountName: 'Eleanor Blackwood',
+    contactFirstName: 'Eleanor',
+    contactLastName: 'Blackwood',
+    emailAddress: 'eleanor.blackwood@gmail.com',
+    phoneNumber: '(415) 935-7567'
+  },
+  {
+    accountName: 'Naomi Tanaka',
+    contactFirstName: 'Naomi', 
+    contactLastName: 'Tanaka',
+    emailAddress: 'naomi.tanaka@gmail.com',
+    phoneNumber: '(415) 885-8901'
+  }
+];
 
 /**
  * Generate random accounts and jobs for testing
@@ -15,37 +33,27 @@ export async function seedDatabase() {
         return;
     }
 
-    let accountToDuplicate = null;
-    let duplicateJobs = [];
-
     // Create 100 random accounts
     for (let i = 0; i < 100; i++) {
+        const firstName = faker.person.firstName();
+        const lastName = faker.person.lastName();
+        const isQbLegalName = Math.random() < 0.95;
+        const accountName = isQbLegalName
+            ? `${firstName} ${lastName}`
+            : `${lastName} & ${faker.person.lastName()}`;
         // Create account with fake data
         const accountData = {
-            accountName: faker.company.name(),
-            contactFirstName: faker.person.firstName(),
-            contactLastName: faker.person.lastName(),
+            accountName,
+            contactFirstName: firstName,
+            contactLastName: lastName,
             phoneNumber: faker.phone.number({ style: 'national' }),
-            emailAddress: faker.internet.email()
+            emailAddress: `${firstName.toLowerCase()}_${lastName.toLowerCase()}@gmail.com`
         };
 
         const account = await createAccount(accountData);
-
-        // Store one random account to duplicate later
-        if (i === Math.floor(Math.random() * 100)) {
-            accountToDuplicate = { ...accountData };
-            
-            // Create 0-6 random jobs and store them for the duplicate
-            const numJobs = Math.floor(Math.random() * 7);
-            for (let j = 0; j < numJobs; j++) {
-                duplicateJobs.push({
-                    jobName: faker.commerce.productName(),
-                    jobDate: faker.date.between({ 
-                        from: '2023-01-01', 
-                        to: '2024-12-31' 
-                    }).toISOString().split('T')[0]
-                });
-            }
+        // If account name is QB legal (no special chars), sync to QuickBooks
+        if (isQbLegalName) {
+          await syncAccountToQuickBooks(account.id, accountName);
         }
 
         // Create 0-6 random jobs for this account
@@ -65,19 +73,42 @@ export async function seedDatabase() {
         }
     }
 
-    // Create the duplicate account with the same jobs
-    if (accountToDuplicate) {
-        const duplicateAccount = await createAccount(accountToDuplicate);
+    // Create duplicate accounts for testing merge functionality
+    for (const account of accountsToMerge) {
+        // Create first instance of the account
+        const account1 = await createAccount(account);
+        await syncAccountToQuickBooks(account1.id, account.accountName);
         
-        // Create the same jobs for the duplicate account
-        for (const job of duplicateJobs) {
+        // Create 1-3 random jobs for first instance
+        const numJobs1 = Math.floor(Math.random() * 3) + 1;
+        for (let i = 0; i < numJobs1; i++) {
             await createJob({
-                ...job,
-                accountId: duplicateAccount.id
+                jobName: faker.commerce.productName(),
+                jobDate: faker.date.between({ 
+                    from: '2023-01-01', 
+                    to: '2024-12-31' 
+                }).toISOString().split('T')[0],
+                accountId: account1.id
+            });
+        }
+
+        // Create second instance of the same account
+        const account2 = await createAccount(account);
+        await syncAccountToQuickBooks(account2.id, account.accountName);
+
+        // Create 1-3 different random jobs for second instance
+        const numJobs2 = Math.floor(Math.random() * 3) + 1;
+        for (let i = 0; i < numJobs2; i++) {
+            await createJob({
+                jobName: faker.commerce.productName(),
+                jobDate: faker.date.between({ 
+                    from: '2023-01-01', 
+                    to: '2024-12-31' 
+                }).toISOString().split('T')[0],
+                accountId: account2.id
             });
         }
     }
 
     console.log('Server - Database seeded successfully!');
-    process.exit(0);
 }
