@@ -7,7 +7,7 @@
     "install": "concurrently \"cd webapp && npm install\" \"cd backend && npm install\"",
     "dev": "npm run install && concurrently \"cd backend && npm run dev\" \"cd webapp && npm run dev\"",
     "clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js",
-    "reset-dev": "npm run clear-db && npm run dev"
+    "reset-dev": "concurrently \"npm run clear-db && npm run dev\" \"sleep 5 && open http://localhost:4618\""
   },
   "dependencies": {
   },

@@ -95,16 +95,22 @@ function Home() {
         {/* Phone Number Issues Card */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-orange-600 mb-4">
-            2. Phone Number Format Issues
+            2. Account Creation Bug - Wrong Phone Number
           </h3>
           <div className="space-y-4">
             <p className="text-gray-600">
-              Recent accounts have incorrect phone number formatting.
-              Please verify phone numbers follow the format:
+              Bug: Phone numbers are not being saved correctly for accounts created after the first one.
             </p>
-            <p className="font-mono bg-gray-100 p-2 rounded">
-              +1 (XXX) XXX-XXXX
-            </p>
+            <div className="text-sm text-gray-600">
+              Steps to reproduce:
+              <ol className="list-decimal list-inside mt-2 space-y-1">
+                <li>Go to the Accounts page</li>
+                <li>Create one new account with a phone number</li>
+                <li>Verify the first account's phone number is correct</li>
+                <li>Create another account with a phone number</li>
+                <li>Notice the second account's phone number is incorrectly formatted</li>
+              </ol>
+            </div>
           </div>
         </div>
 

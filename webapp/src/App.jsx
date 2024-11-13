@@ -22,6 +22,7 @@ function App() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
+              <img src="/apple-touch-icon.png" alt="ByteBounce Logo" className="ml-4 h-8 w-8" />
               <h1 className="ml-4 text-xl font-semibold text-gray-800">ByteBounce</h1>
             </div>
             <div className="flex items-center">

@@ -7,7 +7,9 @@ function Accounts() {
   const [error, setError] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [newAccount, setNewAccount] = useState({
     accountName: '',
     contactFirstName: '',
@@ -23,7 +25,9 @@ function Accounts() {
   const fetchAccounts = async () => {
     try {
       const data = await getAccounts();
-      setAccounts(data);
+      // Sort accounts in reverse order by ID
+      const sortedAccounts = [...data].sort((a, b) => b.id - a.id);
+      setAccounts(sortedAccounts);
       setLoading(false);
     } catch (err) {
       setError('Failed to load accounts');
@@ -31,12 +35,37 @@ function Accounts() {
     }
   };
 
+
+  const validateAndSetPhoneNumber = (newPhoneNumber) => {
+    const strippedPhone = phoneNumber.replace(/\D/g, '');
+    if (strippedPhone.length >= 10) {
+      return;
+    }
+    setPhoneNumber(newPhoneNumber);
+  }
+
   const handleCreateAccount = async (e) => {
     e.preventDefault();
+
+    // Validate phone number has at least 10 characters
+    const strippedPhone = phoneNumber.replace(/\D/g, '');
+    if (strippedPhone.length < 10) {
+      setErrorMessage('Phone number must have at least 10 digits');
+      setShowErrorModal(true);
+      return;
+    }
+
     try {
-      await createAccount(newAccount);
+      const accountToCreate = {
+        ...newAccount,
+        phoneNumber: phoneNumber
+      };
+      
+      await createAccount(accountToCreate);
       await fetchAccounts();
       setShowCreateModal(false);
+      setShowSuccessModal(true);
+      
       setNewAccount({
         accountName: '',
         contactFirstName: '',
@@ -44,6 +73,11 @@ function Accounts() {
         phoneNumber: '',
         emailAddress: ''
       });
+
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => {
+        setShowSuccessModal(false);
+      }, 3000);
     } catch (err) {
       setError('Failed to create account');
     }
@@ -57,6 +91,17 @@ function Accounts() {
       setErrorMessage(err.message);
       setShowErrorModal(true);
     }
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+    setNewAccount({
+      accountName: '',
+      contactFirstName: '',
+      contactLastName: '',
+      phoneNumber: '',
+      emailAddress: ''
+    });
   };
 
   if (loading) return <div className="p-4">Loading accounts...</div>;
@@ -74,6 +119,18 @@ function Accounts() {
           Create Account
         </button>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg">
+          <div className="flex items-center">
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span>Account created successfully!</span>
+          </div>
+        </div>
+      )}
 
       {/* Accounts Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
@@ -175,10 +232,14 @@ function Accounts() {
                 <label className="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input
                   type="tel"
+                  required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   value={newAccount.phoneNumber}
-                  onChange={(e) => setNewAccount({...newAccount, phoneNumber: e.target.value})}
-                  placeholder="(XXX) XXX-XXXX"
+                  onChange={(e) => {
+                    setNewAccount({...newAccount, phoneNumber: e.target.value});
+                    validateAndSetPhoneNumber(e.target.value);
+                  }}
+                  placeholder="XXX-XXX-XXXX"
                 />
               </div>
               <div>
@@ -193,7 +254,7 @@ function Accounts() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={handleCloseCreateModal}
                   className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-300"
                 >
                   Cancel
@@ -221,7 +282,7 @@ function Accounts() {
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-lg font-medium text-gray-900">QuickBooks Sync Error</h3>
+                <h3 className="text-lg font-medium text-gray-900">Error</h3>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">{errorMessage}</p>
                 </div>
