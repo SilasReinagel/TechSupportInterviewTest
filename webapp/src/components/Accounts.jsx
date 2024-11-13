@@ -10,6 +10,7 @@ function Accounts() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [expandedAccountId, setExpandedAccountId] = useState(null);
   const [newAccount, setNewAccount] = useState({
     accountName: '',
     contactFirstName: '',
@@ -34,7 +35,6 @@ function Accounts() {
       setLoading(false);
     }
   };
-
 
   const validateAndSetPhoneNumber = (newPhoneNumber) => {
     const strippedPhone = phoneNumber.replace(/\D/g, '');
@@ -104,6 +104,10 @@ function Accounts() {
     });
   };
 
+  const toggleExpandAccount = (accountId) => {
+    setExpandedAccountId(expandedAccountId === accountId ? null : accountId);
+  };
+
   if (loading) return <div className="p-4">Loading accounts...</div>;
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
@@ -137,6 +141,7 @@ function Accounts() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Account</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
@@ -148,45 +153,87 @@ function Accounts() {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {accounts.map((account) => (
-              <tr key={account.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">#{account.id}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{account.accountName}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {account.contactFirstName} {account.contactLastName}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{account.phoneNumber}</div>
-                  <div className="text-sm text-gray-500">{account.emailAddress}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{account.jobs?.length || 0} jobs</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    account.isSyncedToQuickbooks
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {account.isSyncedToQuickbooks ? 'Synced' : 'Not Synced'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {!account.isSyncedToQuickbooks && (
-                    <button
-                      onClick={() => handleSyncToQuickbooks(account.id)}
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      Sync to QuickBooks
+              <>
+                <tr key={account.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <button onClick={() => toggleExpandAccount(account.id)} className="text-gray-500 hover:text-gray-700">
+                      {expandedAccountId === account.id ? (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      ) : (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      )}
                     </button>
-                  )}
-                </td>
-              </tr>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">#{account.id}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{account.accountName}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {account.contactFirstName} {account.contactLastName}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{account.phoneNumber}</div>
+                    <div className="text-sm text-gray-500">{account.emailAddress}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{account.jobs?.length || 0} jobs</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      account.isSyncedToQuickbooks
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {account.isSyncedToQuickbooks ? 'Synced' : 'Not Synced'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {!account.isSyncedToQuickbooks && (
+                      <button
+                        onClick={() => handleSyncToQuickbooks(account.id)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Sync to QuickBooks
+                      </button>
+                    )}
+                  </td>
+                </tr>
+                {expandedAccountId === account.id && account.jobs && (
+                  <tr>
+                    <td colSpan="8" className="px-6 py-4 bg-gray-50">
+                      <div className="pl-8">
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">Jobs</h4>
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead>
+                            <tr>
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Job ID</th>
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Job Name</th>
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Job Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {account.jobs.map(job => (
+                              <tr key={job.id} className="hover:bg-gray-100">
+                                <td className="px-4 py-2 text-sm text-gray-900">#{job.id}</td>
+                                <td className="px-4 py-2 text-sm text-gray-900">{job.jobName}</td>
+                                <td className="px-4 py-2 text-sm text-gray-900">{job.jobDate}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
             ))}
           </tbody>
         </table>
