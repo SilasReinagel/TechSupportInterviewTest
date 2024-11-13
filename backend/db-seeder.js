@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import { initDb, createAccount, createJob, getAllAccounts } from './db.js';
 import { syncAccountToQuickBooks } from './qb.js';
 
+const numAccountsToMerge = 1;
 const accountsToMerge = []
 
 /**
@@ -22,7 +23,7 @@ export async function seedDatabase() {
     for (let i = 0; i < 100; i++) {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
-        const isQbLegalName = Math.random() <= 0.90;
+        const isQbLegalName = Math.random() <= 0.60;
         const accountName = isQbLegalName
             ? `${firstName} ${lastName}`
             : `${lastName} & ${faker.person.lastName()}`;
@@ -36,7 +37,7 @@ export async function seedDatabase() {
         };
 
         // 10% chance to add account to merge list if we don't already have 2
-        if (accountsToMerge.length < 2 && Math.random() < 0.1) {
+        if (accountsToMerge.length < numAccountsToMerge && Math.random() < 0.1) {
             accountsToMerge.push(accountData);
         }
 

@@ -156,7 +156,7 @@ function Accounts() {
               <>
                 <tr key={account.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <button onClick={() => toggleExpandAccount(account.id)} className="text-gray-500 hover:text-gray-700">
+                    <button onClick={() => toggleExpandAccount(account.id)} className="text-gray-500 hover:text-gray-700 bg-gray-50">
                       {expandedAccountId === account.id ? (
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -199,7 +199,7 @@ function Accounts() {
                     {!account.isSyncedToQuickbooks && (
                       <button
                         onClick={() => handleSyncToQuickbooks(account.id)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 hover:text-blue-900 bg-gray-50"
                       >
                         Sync to QuickBooks
                       </button>
@@ -243,7 +243,7 @@ function Accounts() {
       {showCreateModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-8 max-w-md w-full">
-            <h2 className="text-xl font-semibold mb-4">Create New Account</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">Create New Account</h2>
             <form onSubmit={handleCreateAccount} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Account Name</label>

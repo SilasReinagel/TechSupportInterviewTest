@@ -107,8 +107,8 @@ function Home() {
                 <li>Go to the Accounts page</li>
                 <li>Create one new account with a phone number</li>
                 <li>Verify the first account's phone number is correct</li>
-                <li>Create another account with a phone number</li>
-                <li>Notice the second account's phone number is incorrectly formatted</li>
+                <li>Create another account with a different phone number</li>
+                <li>Notice the second account's phone number is incorrect</li>
               </ol>
             </div>
           </div>

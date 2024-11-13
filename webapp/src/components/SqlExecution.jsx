@@ -3,7 +3,6 @@ import { executeQuery } from '../services/api';
 
 function SqlExecution() {
   const [sql, setSql] = useState('');
-  const [params, setParams] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,12 +14,7 @@ function SqlExecution() {
     setResult(null);
 
     try {
-      // Parse params if provided
-      const parsedParams = params.trim() 
-        ? params.split(',').map(p => p.trim())
-        : [];
-
-      const data = await executeQuery(sql, parsedParams);
+      const data = await executeQuery(sql, []);
       setResult(data);
     } catch (err) {
       setError(err.message);
@@ -65,20 +59,8 @@ function SqlExecution() {
               value={sql}
               onChange={(e) => setSql(e.target.value)}
               className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="SELECT * FROM accounts WHERE id = ?"
+              placeholder="SELECT * FROM accounts"
               required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Parameters (comma-separated)
-            </label>
-            <input
-              type="text"
-              value={params}
-              onChange={(e) => setParams(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-              placeholder="1, 'test', 2024-01-01"
             />
           </div>
           <div>
@@ -152,4 +134,4 @@ function SqlExecution() {
   );
 }
 
-export default SqlExecution; 
+export default SqlExecution;
