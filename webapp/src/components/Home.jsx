@@ -102,13 +102,13 @@ function Home() {
               Bug: Phone numbers are not being saved correctly for accounts created after the first one.
             </p>
             <div className="text-sm text-gray-600">
-              Steps to reproduce:
+              Steps to reproduce (DO NOT LEAVE THE ACCOUNTS PAGE WHILE REPRODUCING):
               <ol className="list-decimal list-inside mt-2 space-y-1">
                 <li>Go to the Accounts page</li>
                 <li>Create one new account with a phone number</li>
-                <li>Verify the first account's phone number is correct</li>
+                <li>Observe the first account's phone number is correct</li>
                 <li>Create another account with a different phone number</li>
-                <li>Notice the second account's phone number is incorrect</li>
+                <li>Observe the second account's phone number is incorrect</li>
               </ol>
             </div>
           </div>

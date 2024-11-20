@@ -6,8 +6,10 @@
     "start": "node backend/index.js",
     "install": "concurrently \"cd webapp && npm install\" \"cd backend && npm install\"",
     "dev": "npm run install && concurrently \"cd backend && npm run dev\" \"cd webapp && npm run dev\"",
-    "clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js",
-    "reset-dev": "concurrently \"npm run clear-db && npm run dev\" \"sleep 10 && open http://localhost:4618\""
+    "mac-clear-db": "cd backend && rm -f data.sqlite && node db-seeder.js",
+    "mac-reset-dev": "concurrently \"npm run mac-clear-db && npm run dev\" \"sleep 10 && open http://localhost:4618\"",
+    "win-clear-db": "cd backend && del /f data.sqlite && node db-seeder.js",
+    "win-reset-dev": "concurrently \"npm run win-clear-db && npm run dev\" \"timeout /t 10 && start http://localhost:4618\""
   },
   "dependencies": {
   },
